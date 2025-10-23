@@ -1,30 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
+    <meta charset="UTF-8">
     <title>MindALT AI</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>MindALT AI</h1>
-    <div id="chatbox"></div>
-    <input type="text" id="userInput" placeholder="Mesajınızı yazın">
+    <h1>MindALT AI Sohbet</h1>
+    <div id="chat"></div>
+    <input type="text" id="message" placeholder="Mesajınızı yazın">
     <button onclick="sendMessage()">Gönder</button>
 
     <script>
         async function sendMessage() {
-            const msg = document.getElementById('userInput').value;
-            if(!msg) return;
-            const response = await fetch('/ask', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+            const msg = document.getElementById("message").value;
+            const res = await fetch("/chat", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({message: msg})
             });
-            const data = await response.json();
-            const chatbox = document.getElementById('chatbox');
-            chatbox.innerHTML += `<p><strong>Sen:</strong> ${msg}</p>`;
-            chatbox.innerHTML += `<p><strong>MindALT AI:</strong> ${data.reply}</p>`;
-            document.getElementById('userInput').value = '';
-            chatbox.scrollTop = chatbox.scrollHeight;
+            const data = await res.json();
+            const chatDiv = document.getElementById("chat");
+            chatDiv.innerHTML += "<p><strong>Sen:</strong> " + msg + "</p>";
+            chatDiv.innerHTML += "<p><strong>MindALT AI:</strong> " + data.reply + "</p>";
         }
     </script>
 </body>

@@ -1,14 +1,11 @@
 # mindalt_ai.py
 import os
-from dotenv import load_dotenv
 import openai
 
-# .env dosyasını yükle
-load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
-    raise SystemExit("OPENAI_API_KEY bulunamadı. .env kullan veya terminalden export yap.")
-openai.api_key = api_key
+# OPENAI_API_KEY environment variable’dan alınacak
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+if not openai.api_key:
+    raise SystemExit("OPENAI_API_KEY environment variable olarak tanımlanmalı!")
 
 SYSTEM_MESSAGE = """
 Sen MindALT AI'sın, kullanıcıya nazik, açıklayıcı ve yardımcı bir şekilde cevap veriyorsun.
@@ -99,8 +96,6 @@ def chat_with_mindalt():
             continue
         reply = sanitize_input(resp.choices[0].message.content)
         print(f"MindALT AI: {reply}\n")
-        usage = resp.usage
-        print(f"[Token kullanımı -> Prompt: {usage.prompt_tokens}, Completion: {usage.completion_tokens}, Total: {usage.total_tokens}]\n")
         conversation.append({"role": "assistant", "content": reply})
 
 # Web backend için tek mesajlık API fonksiyonu
