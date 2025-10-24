@@ -1,38 +1,56 @@
-const form = document.getElementById("chat-form");
-const input = document.getElementById("message-input");
-const chatContainer = document.getElementById("chat-container");
+async function sendMessage() {
+  const userInput = document.getElementById("user-input");
+  const chatBox = document.getElementById("chat-box");
+  const userMessage = userInput.value.trim();
 
-form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const message = input.value.trim();
-    if (!message) return;
+  if (!userMessage) return;
 
-    // Kullanıcının mesajını göster
-    addMessage(message, "user");
-    input.value = "";
+  // Kullanıcı mesajını ekle
+  addMessage("Kullanıcı", userMessage);
+  userInput.value = "";
 
-    try {
-        const res = await fetch("https://mindalt-web-1-0.onrender.com/api", {  // canlı URL
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message })
-        });
+  // MindAlt yanıt bekleniyor animasyonu
+  const loadingMessage = addMessage("MindAlt", "...");
+  loadingMessage.classList.add("loading");
 
-        const data = await res.json();
-        if (data.answer) {
-            addMessage(data.answer, "bot");  // GPT cevabı
-        } else {
-            addMessage("Bir hata oluştu...", "bot");
-        }
-    } catch (err) {
-        addMessage("Bir hata oluştu...", "bot");
+  try {
+    const response = await fetch("/ask", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message: userMessage }),
+    });
+
+    const data = await response.json();
+    loadingMessage.remove();
+
+    if (data.reply) {
+      addMessage("MindAlt", data.reply);
+    } else {
+      addMessage("MindAlt", "Bir hata oluştu, lütfen tekrar dene.");
     }
+  } catch (error) {
+    console.error("Hata:", error);
+    loadingMessage.remove();
+    addMessage("MindAlt", "Bir bağlantı hatası oluştu.");
+  }
+}
+
+function addMessage(sender, text) {
+  const chatBox = document.getElementById("chat-box");
+  const messageDiv = document.createElement("div");
+  messageDiv.classList.add("message", sender.toLowerCase());
+  messageDiv.textContent = `${sender}: ${text}`;
+  chatBox.appendChild(messageDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  return messageDiv;
+}
+
+// Enter tuşuyla mesaj gönderme
+document.getElementById("user-input").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") sendMessage();
 });
 
-function addMessage(text, sender) {
-    const msg = document.createElement("div");
-    msg.className = `message ${sender}`;
-    msg.textContent = text;
-    chatContainer.appendChild(msg);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-}
+// Buton tıklamayla mesaj gönderme
+document.getElementById("send-btn").addEventListener("click", sendMessage);
