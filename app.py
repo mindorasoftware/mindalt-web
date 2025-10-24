@@ -1,23 +1,24 @@
-# app.py
-from flask import Flask, request, jsonify, render_template
-import os
-from mindalt_ai import chat_with_mindalt_api
+from flask import Flask, render_template, request, jsonify
+import openai, os
 
 app = Flask(__name__)
 
-@app.route("/")
+openai.api_key = os.environ.get('OPENAI_API_KEY')
+
+@app.route('/')
 def index():
-    return render_template("index.html")  # templates/index.html kullanılacak
+    return render_template('index.html')
 
-@app.route("/chat", methods=["POST"])
+@app.route('/chat', methods=['POST'])
 def chat():
-    data = request.get_json()
-    user_input = data.get("message")
-    if not user_input:
-        return jsonify({"error": "Mesaj boş olamaz."}), 400
-    response = chat_with_mindalt_api(user_input)
-    return jsonify({"reply": response})
+    user_msg = request.json['message']
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": user_msg}],
+        max_tokens=300
+    )
+    reply = response.choices[0].message.content
+    return jsonify({'reply': reply})
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Render için dinamik port
-    app.run(host="0.0.0.0", port=port)
+if __name__ == '__main__':
+    app.run(debug=True)
