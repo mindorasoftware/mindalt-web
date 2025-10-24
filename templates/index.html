@@ -2,27 +2,60 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>MindALT AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindalt AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>MindALT AI Sohbet</h1>
-    <div id="chat"></div>
-    <input type="text" id="message" placeholder="Mesajınızı yazın">
-    <button onclick="sendMessage()">Gönder</button>
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+            <h1>Mindalt AI</h1>
+        </div>
+        <div id="chat-box" class="chat-box"></div>
+        <form id="chat-form" class="chat-form">
+            <input type="text" id="user-input" placeholder="Bir mesaj yaz..." autocomplete="off">
+            <button type="submit">Gönder</button>
+        </form>
+    </div>
 
     <script>
-        async function sendMessage() {
-            const msg = document.getElementById("message").value;
-            const res = await fetch("/chat", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({message: msg})
-            });
-            const data = await res.json();
-            const chatDiv = document.getElementById("chat");
-            chatDiv.innerHTML += "<p><strong>Sen:</strong> " + msg + "</p>";
-            chatDiv.innerHTML += "<p><strong>MindALT AI:</strong> " + data.reply + "</p>";
+        const form = document.getElementById('chat-form');
+        const input = document.getElementById('user-input');
+        const chatBox = document.getElementById('chat-box');
+
+        function addMessage(sender, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', sender);
+            msgDiv.textContent = text;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userText = input.value.trim();
+            if(!userText) return;
+            addMessage('user', userText);
+            input.value = '';
+            
+            // Gönderirken "yazıyor..." baloncuğu
+            const typingMsg = document.createElement('div');
+            typingMsg.classList.add('message', 'ai', 'typing');
+            typingMsg.textContent = '...';
+            chatBox.appendChild(typingMsg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const res = await fetch('/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: userText })
+            });
+
+            const data = await res.json();
+            typingMsg.remove();
+            addMessage('ai', data.answer);
+        });
     </script>
 </body>
 </html>
