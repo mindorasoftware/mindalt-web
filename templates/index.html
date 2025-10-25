@@ -167,6 +167,7 @@
             box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
             z-index: 10;
             position: relative;
+            height: 100vh;
         }
 
         .logo-container {
@@ -256,6 +257,8 @@
             flex-direction: column;
             z-index: 10;
             position: relative;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .chat-header {
@@ -266,6 +269,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
 
         .header-title {
@@ -276,12 +280,13 @@
 
         .chat-container {
             flex: 1;
-            overflow-y: scroll;
+            overflow-y: auto;
             overflow-x: hidden;
             padding: 30px;
             display: flex;
             flex-direction: column;
             gap: 20px;
+            min-height: 0;
         }
 
         .message {
@@ -369,6 +374,7 @@
             backdrop-filter: blur(10px);
             padding: 20px 30px;
             border-top: 1px solid rgba(42, 82, 152, 0.1);
+            flex-shrink: 0;
         }
 
         .input-wrapper {
@@ -448,7 +454,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100%;
+            min-height: 100%;
             text-align: center;
             padding: 40px;
         }
@@ -545,7 +551,7 @@
     <div class="welcome-modal-overlay" id="welcomeModalOverlay">
         <div class="welcome-modal-content">
             <div class="modal-logo-container">
-                <img src="{{ url_for('static', filename='logo.png') }}" alt="MindALT AI Logo" class="modal-logo">
+                <img src="https://via.placeholder.com/100/2a5298/ffffff?text=AI" alt="MindALT AI Logo" class="modal-logo">
             </div>
             
             <h1 class="modal-title">MindALT AI - Sürekli Gelişen Teknolojilerle Geleceğe Adım Atıyoruz!</h1>
@@ -581,7 +587,7 @@
     <div class="sidebar">
         <div class="logo-container">
             <div class="logo">
-                <img src="{{ url_for('static', filename='logo.png') }}" alt="MindALT AI Logo">
+                <img src="https://via.placeholder.com/50/2a5298/ffffff?text=AI" alt="MindALT AI Logo">
             </div>
             <div class="logo-text">MindALT AI</div>
         </div>
@@ -606,7 +612,7 @@
         <div class="chat-container" id="chatContainer">
             <div class="welcome-screen" id="welcomeScreen">
                 <div class="welcome-logo">
-                    <img src="{{ url_for('static', filename='logo.png') }}" alt="MindALT AI">
+                    <img src="https://via.placeholder.com/120/2a5298/ffffff?text=AI" alt="MindALT AI">
                 </div>
                 <h1 class="welcome-title">MindALT AI'ya Hoş Geldiniz</h1>
                 <p class="welcome-subtitle">Size nasıl yardımcı olabilirim?</p>
@@ -679,7 +685,9 @@
         let messageCount = 0;
 
         function forceScrollToBottom() {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            setTimeout(() => {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 0);
         }
 
         function addMessage(text, isUser) {
@@ -706,7 +714,6 @@
                 content.textContent = text;
                 forceScrollToBottom();
             } else {
-                // Typing effect
                 let i = 0;
                 const typingInterval = setInterval(() => {
                     if (i < text.length) {
@@ -754,25 +761,11 @@
             
             showTypingIndicator();
 
-            try {
-                const response = await fetch('/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_input: message })
-                });
-
-                const data = await response.json();
+            // Demo yanıt (gerçek backend bağlantınız varsa bu kısmı değiştirin)
+            setTimeout(() => {
                 removeTypingIndicator();
-
-                if (data.error) {
-                    addMessage(`Hata: ${data.error}`, false);
-                } else {
-                    addMessage(data.response, false);
-                }
-            } catch (error) {
-                removeTypingIndicator();
-                addMessage(`Bağlantı hatası: ${error.message}`, false);
-            }
+                addMessage('Bu bir demo yanıttır. Backend bağlantınızı yaparak gerçek AI yanıtları alabilirsiniz. Mesajınız: ' + message, false);
+            }, 1500);
         }
 
         function sendExamplePrompt(text) {
