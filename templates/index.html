@@ -553,7 +553,11 @@
                 messageDiv.appendChild(avatar);
                 messageDiv.appendChild(content);
                 chatContainer.appendChild(messageDiv);
-                scrollToBottom();
+                
+                // Kullanıcı mesajı için anında scroll
+                requestAnimationFrame(() => {
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                });
             } else {
                 // Typing effect
                 messageDiv.appendChild(avatar);
@@ -565,19 +569,26 @@
                     if (i < text.length) {
                         content.textContent += text.charAt(i);
                         i++;
-                        scrollToBottom();
+                        // Her karakterde scroll
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
                     } else {
                         clearInterval(typingInterval);
-                        scrollToBottom();
+                        // Son bir kez daha scroll
+                        requestAnimationFrame(() => {
+                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                        });
                     }
                 }, 20);
             }
         }
 
         function scrollToBottom() {
-            setTimeout(() => {
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }, 100);
+            requestAnimationFrame(() => {
+                chatContainer.scrollTo({
+                    top: chatContainer.scrollHeight,
+                    behavior: 'smooth'
+                });
+            });
         }
 
         function showTypingIndicator() {
