@@ -20,7 +20,115 @@
             position: relative;
         }
 
-        /* Matrix Parçacık Efekti */
+        /* Welcome Modal */
+        .welcome-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+        }
+
+        .welcome-modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 650px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.5s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(100px) scale(0.9);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-logo-container {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(42, 82, 152, 0.3);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2a5298, #1e3c72);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .modal-text {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #333;
+            margin-bottom: 18px;
+            text-align: justify;
+        }
+
+        .modal-signature {
+            font-size: 15px;
+            color: #555;
+            text-align: right;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .modal-signature strong {
+            color: #1e3c72;
+            font-weight: 700;
+        }
+
+        .modal-accept-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #2a5298, #1e3c72);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(42, 82, 152, 0.3);
+        }
+
+        .modal-accept-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 35px rgba(42, 82, 152, 0.5);
+        }
+
+        .modal-accept-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Particles */
         .particles {
             position: fixed;
             top: 0;
@@ -168,13 +276,12 @@
 
         .chat-container {
             flex: 1;
-            overflow-y: auto;
+            overflow-y: scroll;
             overflow-x: hidden;
             padding: 30px;
             display: flex;
             flex-direction: column;
             gap: 20px;
-            scroll-behavior: smooth;
         }
 
         .message {
@@ -234,7 +341,6 @@
             border-bottom-right-radius: 6px;
         }
 
-        /* Typing Effect */
         .typing-indicator {
             display: flex;
             gap: 5px;
@@ -320,102 +426,6 @@
             transform: scale(0.95);
         }
 
-        /* Welcome Modal */
-        .welcome-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            animation: fadeIn 0.5s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 24px;
-            padding: 40px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: slideUp 0.5s;
-            position: relative;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .modal-logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-            display: block;
-        }
-
-        .modal-title {
-            font-size: 28px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #2a5298, #1e3c72);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-text {
-            font-size: 15px;
-            line-height: 1.8;
-            color: #333;
-            margin-bottom: 15px;
-            text-align: justify;
-        }
-
-        .modal-signature {
-            font-size: 14px;
-            color: #666;
-            text-align: right;
-            margin-top: 20px;
-            font-style: italic;
-        }
-
-        .modal-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #2a5298, #1e3c72);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s;
-        }
-
-        .modal-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(42, 82, 152, 0.4);
-        }
-
-        .modal-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -433,7 +443,6 @@
             background: rgba(42, 82, 152, 0.5);
         }
 
-        /* Welcome Screen */
         .welcome-screen {
             display: flex;
             flex-direction: column;
@@ -512,7 +521,6 @@
             font-weight: 500;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
@@ -533,7 +541,40 @@
     </style>
 </head>
 <body>
-    <!-- Parçacık Efekti -->
+    <!-- Welcome Modal -->
+    <div class="welcome-modal-overlay" id="welcomeModalOverlay">
+        <div class="welcome-modal-content">
+            <div class="modal-logo-container">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="MindALT AI Logo" class="modal-logo">
+            </div>
+            
+            <h1 class="modal-title">MindALT AI - Sürekli Gelişen Teknolojilerle Geleceğe Adım Atıyoruz!</h1>
+            
+            <p class="modal-text">
+                MindALT AI olarak, yapay zeka teknolojilerini her geçen gün daha da geliştirmeye ve kullanıcılarımıza en son yenilikleri sunmaya kararlıyız. Şirketimiz, sürekli olarak yeni özellikler ekleyerek, kullanıcı deneyimini daha da iyileştiriyor. Geliştirme sürecinde olan özelliklerimizle, AI tabanlı çözümleri her geçen gün daha güçlü, daha kullanıcı dostu ve daha verimli hale getirmeyi hedefliyoruz.
+            </p>
+            
+            <p class="modal-text">
+                Yeni özelliklerimiz arasında, daha zengin içerik üretme araçları, özel metin ve resim promptları gibi unsurlar yer alacak. Zaman içinde, kullanıcılarımızın ihtiyaçlarına en iyi şekilde cevap verecek inovatif çözümlerimiz devreye girecek.
+            </p>
+            
+            <p class="modal-text">
+                MindALT AI'nin sunduğu bu heyecan verici gelişmelerle, yapay zeka dünyasında daha ileriye adım atıyoruz. Gelişmelerden haberdar olmak ve yeni özellikleri keşfetmek için bizi takip etmeye devam edin!
+            </p>
+            
+            <div class="modal-signature">
+                Saygılarımızla,<br>
+                <strong>Muhammed Altar Çokur</strong><br>
+                MindALT AI
+            </div>
+            
+            <button class="modal-accept-btn" onclick="closeModal()">
+                ✨ Tamam
+            </button>
+        </div>
+    </div>
+
+    <!-- Particles -->
     <div class="particles" id="particles"></div>
 
     <!-- Sidebar -->
@@ -607,7 +648,17 @@
     </div>
 
     <script>
-        // Parçacık Efekti
+        // Modal Control
+        function closeModal() {
+            const modal = document.getElementById('welcomeModalOverlay');
+            modal.style.opacity = '0';
+            modal.style.transition = 'opacity 0.3s';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        // Particles
         function createParticles() {
             const container = document.getElementById('particles');
             for (let i = 0; i < 50; i++) {
@@ -627,6 +678,10 @@
         const userInput = document.getElementById('userInput');
         let messageCount = 0;
 
+        function forceScrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
         function addMessage(text, isUser) {
             if (messageCount === 0) {
                 welcomeScreen.style.display = 'none';
@@ -643,47 +698,27 @@
             const content = document.createElement('div');
             content.className = 'message-content';
             
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            chatContainer.appendChild(messageDiv);
+            
             if (isUser) {
                 content.textContent = text;
-                messageDiv.appendChild(avatar);
-                messageDiv.appendChild(content);
-                chatContainer.appendChild(messageDiv);
-                
-                // Kullanıcı mesajı için anında scroll
-                requestAnimationFrame(() => {
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-                });
+                forceScrollToBottom();
             } else {
                 // Typing effect
-                messageDiv.appendChild(avatar);
-                messageDiv.appendChild(content);
-                chatContainer.appendChild(messageDiv);
-                
                 let i = 0;
                 const typingInterval = setInterval(() => {
                     if (i < text.length) {
                         content.textContent += text.charAt(i);
                         i++;
-                        // Her karakterde scroll
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        forceScrollToBottom();
                     } else {
                         clearInterval(typingInterval);
-                        // Son bir kez daha scroll
-                        requestAnimationFrame(() => {
-                            chatContainer.scrollTop = chatContainer.scrollHeight;
-                        });
+                        forceScrollToBottom();
                     }
                 }, 20);
             }
-        }
-
-        function scrollToBottom() {
-            requestAnimationFrame(() => {
-                chatContainer.scrollTo({
-                    top: chatContainer.scrollHeight,
-                    behavior: 'smooth'
-                });
-            });
         }
 
         function showTypingIndicator() {
@@ -702,11 +737,7 @@
             messageDiv.appendChild(avatar);
             messageDiv.appendChild(content);
             chatContainer.appendChild(messageDiv);
-            
-            // Typing indicator eklenince scroll
-            requestAnimationFrame(() => {
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            });
+            forceScrollToBottom();
         }
 
         function removeTypingIndicator() {
@@ -738,12 +769,6 @@
                 } else {
                     addMessage(data.response, false);
                 }
-                
-                // Mesaj bittikten sonra son bir kez scroll
-                setTimeout(() => {
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-                }, 100);
-                
             } catch (error) {
                 removeTypingIndicator();
                 addMessage(`Bağlantı hatası: ${error.message}`, false);
@@ -762,7 +787,6 @@
             chatContainer.appendChild(welcomeScreen);
         }
 
-        // Auto-focus input
         userInput.focus();
     </script>
 </body>
