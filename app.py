@@ -20,7 +20,18 @@ except ImportError as e:
     get_response = mindalt_ai.get_response
 
 app = Flask(__name__)
-CORS(app)
+
+# CORS ayarları - sadece kendi domain'inden isteklere izin ver
+CORS(app, resources={
+    r"/*": {
+        "origins": [
+            "https://mindaltai.com",
+            "https://www.mindaltai.com",
+            "http://localhost:*",
+            "http://127.0.0.1:*"
+        ]
+    }
+})
 
 # Ana sayfa route'u
 @app.route('/')
