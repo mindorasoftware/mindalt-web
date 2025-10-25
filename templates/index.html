@@ -169,10 +169,12 @@
         .chat-container {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 30px;
             display: flex;
             flex-direction: column;
             gap: 20px;
+            scroll-behavior: smooth;
         }
 
         .message {
@@ -474,13 +476,13 @@
                 <p class="welcome-subtitle">Size nasıl yardımcı olabilirim?</p>
                 
                 <div class="example-prompts">
-                    <div class="example-card" onclick="sendExamplePrompt('Altar kimdir?')">
+                    <div class="example-card" onclick="sendExamplePrompt('Muhammed Altar Çokur kimdir?')">
                         <div class="example-icon">👤</div>
-                        <div class="example-text">Altar kimdir?</div>
+                        <div class="example-text">Muhammed Altar Çokur kimdir?</div>
                     </div>
-                    <div class="example-card" onclick="sendExamplePrompt('Scarven oyunu hakkında bilgi ver')">
+                    <div class="example-card" onclick="sendExamplePrompt('Scarven: Veil Within hakkında bilgi ver')">
                         <div class="example-icon">🎮</div>
-                        <div class="example-text">Scarven oyunu nedir?</div>
+                        <div class="example-text">Scarven: Veil Within nedir?</div>
                     </div>
                     <div class="example-card" onclick="sendExamplePrompt('Mindora Software ne yapar?')">
                         <div class="example-icon">💼</div>
@@ -551,6 +553,7 @@
                 messageDiv.appendChild(avatar);
                 messageDiv.appendChild(content);
                 chatContainer.appendChild(messageDiv);
+                scrollToBottom();
             } else {
                 // Typing effect
                 messageDiv.appendChild(avatar);
@@ -562,14 +565,19 @@
                     if (i < text.length) {
                         content.textContent += text.charAt(i);
                         i++;
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        scrollToBottom();
                     } else {
                         clearInterval(typingInterval);
+                        scrollToBottom();
                     }
                 }, 20);
             }
-            
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function scrollToBottom() {
+            setTimeout(() => {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 100);
         }
 
         function showTypingIndicator() {
@@ -588,7 +596,7 @@
             messageDiv.appendChild(avatar);
             messageDiv.appendChild(content);
             chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            scrollToBottom();
         }
 
         function removeTypingIndicator() {
