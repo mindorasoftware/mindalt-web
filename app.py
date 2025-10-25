@@ -1,9 +1,98 @@
-from flask import Flask, request, jsonify, render_template
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Admin Girişi</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+                    height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0;
+                }
+                .login-box {
+                    background: white;
+                    padding: 40px;
+                    border-radius: 16px;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                    text-align: center;
+                }
+                h1 {
+                    color: #1e3c72;
+                    margin-bottom: 20px;
+                }
+                input {
+                    width: 100%;
+                    padding: 12px;
+                    margin: 10px 0;
+                    border: 2px solid #ddd;
+                    border-radius: 8px;
+                    font-size: 16px;
+                }
+                button {
+                    width: 100%;
+                    padding: 14px;
+                    background: linear-gradient(135deg, #2a5298, #1e3c72);
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    margin-top: 10px;
+                }
+                button:hover {
+                    opacity: 0.9;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="login-box">
+                <h1>🔒 Admin Girişi</h1>
+                <form method="GET" action="/admin">
+                    <input type="text" name="username" placeholder="Kullanıcı Adı" value="admin" readonly>
+                    <input type="password" name="password" placeholder="Şifre" id="password" required>
+                    <button type="button" onclick="login()">Giriş Yap</button>
+                </form>
+            </div>
+            <script>
+                function login() {
+                    const password = document.getElementById('password').value;
+                    if (!password) {
+                        alert('Lütfen şifrenizi girin!');
+                        return;
+                    }
+                    // Basic Auth ile sayfa yenile
+                    const url = '/admin';
+                    fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': 'Basic ' + btoa('admin:' + password)
+                        }
+                    }).then(response => {
+                        if (response.ok) {
+                            // Şifre doğru, sayfayı yenile
+                            window.location.href = url + '?auth=' + btoa('admin:' + password);
+                        } else {
+                            alert('Hatalı şifre!');
+                        }
+                    }).catch(err => {
+                        alert('Bağlantı hatası!');
+                    });
+                }
+            </script>
+        </body>
+        </html>
+        ''', 401, {'WWW-Authenticate': 'Basic realm="Admin Login"'}from flask import Flask, request, jsonify, render_template, session, redirect, url_for, render_template_string
 from flask_cors import CORS
 import os
 import sys
 import sqlite3
 from datetime import datetime
+from functools import wraps
 
 # Mevcut dizini Python path'e ekle
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -22,6 +111,7 @@ except ImportError as e:
     get_response = mindalt_ai.get_response
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "mindalt-super-secret-key-2025")
 
 # CORS ayarları - sadece kendi domain'inden isteklere izin ver
 CORS(app, resources={
@@ -34,6 +124,9 @@ CORS(app, resources={
         ]
     }
 })
+
+# Admin şifresi (ortam değişkeninden al veya varsayılan kullan)
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "mindalt2025")
 
 # SQLite Veritabanı Kurulumu
 def init_db():
@@ -138,29 +231,125 @@ def dashboard():
             output = get_response(input_text)
     return render_template('dashboard.html', output=output)
 
-# Admin şifresi (ortam değişkeninden al veya varsayılan kullan)
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "mindalt2025")  # Bu şifreyi değiştir!
+# Admin Login Sayfası
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if password == ADMIN_PASSWORD:
+            session['admin_logged_in'] = True
+            return redirect(url_for('admin_panel'))
+        else:
+            return render_template_string(LOGIN_TEMPLATE, error="Hatalı şifre!")
+    return render_template_string(LOGIN_TEMPLATE)
 
-# Admin girişi kontrolü
-def check_admin_auth():
-    auth = request.authorization
-    if not auth or auth.password != ADMIN_PASSWORD:
-        return False
-    return True
+# Admin Logout
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('admin_login'))
 
-# Admin İstatistik Sayfası - ŞİFRELİ
+# Login Template
+LOGIN_TEMPLATE = '''
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Girişi - MindALT AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-box {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            width: 400px;
+        }
+        h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #2a5298, #1e3c72);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+        }
+        input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #2a5298, #1e3c72);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(42, 82, 152, 0.4);
+        }
+        .error {
+            color: #e74c3c;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>🔒 Admin Girişi</h1>
+        <form method="POST">
+            <input type="password" name="password" placeholder="Admin Şifresi" required autofocus>
+            <button type="submit">Giriş Yap</button>
+            {% if error %}
+            <div class="error">{{ error }}</div>
+            {% endif %}
+        </form>
+    </div>
+</body>
+</html>
+'''
+
+# Admin İstatistik API
 @app.route('/admin/stats')
+@login_required
 def admin_stats():
-    if not check_admin_auth():
-        return jsonify({"error": "Yetkisiz erişim"}), 401
     stats = get_stats()
     return jsonify(stats)
 
-# Admin Panel HTML - ŞİFRELİ
+# Admin Panel
 @app.route('/admin')
+@login_required
 def admin_panel():
-    if not check_admin_auth():
-        return '''
+    return '''
         <!DOCTYPE html>
         <html>
         <head>
@@ -363,6 +552,7 @@ def admin_panel():
             </div>
             
             <button class="refresh-btn" onclick="loadStats()">🔄 Yenile</button>
+            <button class="refresh-btn" onclick="logout()" style="background: #e74c3c; margin-top: 10px;">🚪 Çıkış Yap</button>
             
             <div class="last-update" id="lastUpdate">-</div>
         </div>
@@ -370,14 +560,10 @@ def admin_panel():
         <script>
             async function loadStats() {
                 try {
-                    const response = await fetch('/admin/stats', {
-                        headers: {
-                            'Authorization': 'Basic ' + btoa('admin:' + getCookie('admin_pass'))
-                        }
-                    });
+                    const response = await fetch('/admin/stats');
                     
                     if (!response.ok) {
-                        window.location.reload();
+                        window.location.href = '/admin/login';
                         return;
                     }
                     
@@ -395,11 +581,8 @@ def admin_panel():
                 }
             }
             
-            function getCookie(name) {
-                const value = "; " + document.cookie;
-                const parts = value.split("; " + name + "=");
-                if (parts.length === 2) return parts.pop().split(";").shift();
-                return '';
+            function logout() {
+                window.location.href = '/admin/logout';
             }
             
             // Sayfa yüklenince istatistikleri getir
