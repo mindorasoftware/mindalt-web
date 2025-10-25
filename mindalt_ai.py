@@ -50,6 +50,9 @@ CUSTOM_ANSWERS = {
 
 BANNED_WORDS = ["gpt", "openai"]
 
+# Konuşma geçmişini saklamak için global dictionary (her kullanıcı için ayrı)
+conversation_histories = {}
+
 def sanitize_input(text):
     sanitized = text.lower()
     for word in BANNED_WORDS:
@@ -63,23 +66,59 @@ def check_custom_answers(user_input):
             return answer
     return None
 
-def chat_with_mindalt_api(user_input):
+def chat_with_mindalt_api(user_input, user_id="default"):
     sanitized_input = sanitize_input(user_input)
     custom_reply = check_custom_answers(sanitized_input)
+    
+    # Kullanıcının konuşma geçmişini al veya oluştur
+    if user_id not in conversation_histories:
+        conversation_histories[user_id] = []
+    
     if custom_reply:
+        # Custom cevap varsa geçmişe ekle
+        conversation_histories[user_id].append({"role": "user", "content": sanitized_input})
+        conversation_histories[user_id].append({"role": "assistant", "content": custom_reply})
+        
+        # Geçmişi son 20 mesajla sınırla (10 soru-cevap çifti)
+        if len(conversation_histories[user_id]) > 20:
+            conversation_histories[user_id] = conversation_histories[user_id][-20:]
+        
         return custom_reply
 
     try:
+        # Mesaj geçmişini hazırla
+        messages = [{"role": "system", "content": SYSTEM_MESSAGE}]
+        messages.extend(conversation_histories[user_id])
+        messages.append({"role": "user", "content": sanitized_input})
+        
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[{"role": "system", "content": SYSTEM_MESSAGE},
-                      {"role": "user", "content": sanitized_input}],
+            messages=messages,
             max_tokens=300,
         )
         reply = completion.choices[0].message.content.strip()
-        return sanitize_input(reply)
+        sanitized_reply = sanitize_input(reply)
+        
+        # Konuşmayı geçmişe ekle
+        conversation_histories[user_id].append({"role": "user", "content": sanitized_input})
+        conversation_histories[user_id].append({"role": "assistant", "content": sanitized_reply})
+        
+        # Geçmişi son 20 mesajla sınırla (10 soru-cevap çifti)
+        if len(conversation_histories[user_id]) > 20:
+            conversation_histories[user_id] = conversation_histories[user_id][-20:]
+        
+        return sanitized_reply
     except Exception as e:
         return f"MindALT AI sistem hatası: {e}"
 
-def get_response(user_input):
-    return chat_with_mindalt_api(user_input)
+def get_response(user_input, user_id="default"):
+    """
+    user_id: Her kullanıcı için benzersiz ID (session ID, kullanıcı ID vs.)
+    Eğer belirtilmezse 'default' kullanılır
+    """
+    return chat_with_mindalt_api(user_input, user_id)
+
+def clear_history(user_id="default"):
+    """Belirli bir kullanıcının konuşma geçmişini siler"""
+    if user_id in conversation_histories:
+        conversation_histories[user_id] = []
