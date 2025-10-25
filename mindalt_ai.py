@@ -1,4 +1,3 @@
-# mindalt_ai.py
 import os
 from openai import OpenAI
 
@@ -63,7 +62,6 @@ def check_custom_answers(user_input):
             return answer
     return None
 
-
 def chat_with_mindalt_api(user_input):
     sanitized_input = sanitize_input(user_input)
     custom_reply = check_custom_answers(sanitized_input)
@@ -73,10 +71,8 @@ def chat_with_mindalt_api(user_input):
     try:
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": SYSTEM_MESSAGE},
-                {"role": "user", "content": sanitized_input},
-            ],
+            messages=[{"role": "system", "content": SYSTEM_MESSAGE},
+                      {"role": "user", "content": sanitized_input}],
             max_tokens=300,
         )
         reply = completion.choices[0].message.content.strip()
@@ -84,12 +80,5 @@ def chat_with_mindalt_api(user_input):
     except Exception as e:
         return f"MindALT AI sistem hatası: {e}"
 
-
-if __name__ == "__main__":
-    print("=== MindALT AI Terminal Sohbeti ===")
-    while True:
-        q = input("Sen: ")
-        if q.lower() in ["çık", "exit", "quit"]:
-            print("MindALT AI: Görüşürüz! 😊")
-            break
-        print("MindALT AI:", chat_with_mindalt_api(q))
+def get_response(user_input):
+    return chat_with_mindalt_api(user_input)
