@@ -1,24 +1,19 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindAlt AI</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8" />
+  <title>MindALT AI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>MindAlt AI</h1>
-        </header>
-        <div id="chat-container" class="chat-container">
-            <!-- Mesajlar buraya gelecek -->
-        </div>
-        <form id="chat-form" class="chat-form">
-            <input type="text" id="user-input" placeholder="Sorunu yaz..." autocomplete="off">
-            <button type="submit">Gönder</button>
-        </form>
-    </div>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <div class="container">
+    <h2>MindALT AI</h2>
+    <textarea id="question" rows="3" placeholder="Bir şey sor..."></textarea>
+    <button onclick="sendQuestion()">Gönder</button>
+    <pre id="answer"></pre>
+    <a href="{{ url_for('dashboard') }}">→ Dashboard</a>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
