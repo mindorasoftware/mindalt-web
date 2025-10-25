@@ -551,7 +551,7 @@
     <div class="welcome-modal-overlay" id="welcomeModalOverlay">
         <div class="welcome-modal-content">
             <div class="modal-logo-container">
-                <img src="https://via.placeholder.com/100/2a5298/ffffff?text=AI" alt="MindALT AI Logo" class="modal-logo">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="MindALT AI Logo" class="modal-logo">
             </div>
             
             <h1 class="modal-title">MindALT AI - Sürekli Gelişen Teknolojilerle Geleceğe Adım Atıyoruz!</h1>
@@ -587,7 +587,7 @@
     <div class="sidebar">
         <div class="logo-container">
             <div class="logo">
-                <img src="https://via.placeholder.com/50/2a5298/ffffff?text=AI" alt="MindALT AI Logo">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="MindALT AI Logo">
             </div>
             <div class="logo-text">MindALT AI</div>
         </div>
@@ -612,7 +612,7 @@
         <div class="chat-container" id="chatContainer">
             <div class="welcome-screen" id="welcomeScreen">
                 <div class="welcome-logo">
-                    <img src="https://via.placeholder.com/120/2a5298/ffffff?text=AI" alt="MindALT AI">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="MindALT AI">
                 </div>
                 <h1 class="welcome-title">MindALT AI'ya Hoş Geldiniz</h1>
                 <p class="welcome-subtitle">Size nasıl yardımcı olabilirim?</p>
@@ -752,7 +752,7 @@
             if (indicator) indicator.remove();
         }
 
-        async function sendMessage() {
+            async function sendMessage() {
             const message = userInput.value.trim();
             if (!message) return;
 
@@ -761,11 +761,25 @@
             
             showTypingIndicator();
 
-            // Demo yanıt (gerçek backend bağlantınız varsa bu kısmı değiştirin)
-            setTimeout(() => {
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_input: message })
+                });
+
+                const data = await response.json();
                 removeTypingIndicator();
-                addMessage('Bu bir demo yanıttır. Backend bağlantınızı yaparak gerçek AI yanıtları alabilirsiniz. Mesajınız: ' + message, false);
-            }, 1500);
+
+                if (data.error) {
+                    addMessage(`Hata: ${data.error}`, false);
+                } else {
+                    addMessage(data.response, false);
+                }
+            } catch (error) {
+                removeTypingIndicator();
+                addMessage(`Bağlantı hatası: ${error.message}`, false);
+            }
         }
 
         function sendExamplePrompt(text) {
